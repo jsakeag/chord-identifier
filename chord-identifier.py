@@ -1,6 +1,7 @@
 MAJOR_SPACING = [0, 4, 7]
 MINOR_SPACING = [0, 3, 7]
 
+# Dictionary for mapping flat notes & white sharp notes to their equivalent keys
 note_equivalent_map = {
     "B#": "C",
     "Db": "C#",
@@ -12,6 +13,8 @@ note_equivalent_map = {
     "Bb": "A#",
     "Cb": "B"
 }
+
+# Dictionary for mapping keys to indexes
 note_index_map = {
     "C": 1,
     "C#": 2,
@@ -27,9 +30,7 @@ note_index_map = {
     "B": 12
 }
 
-# add between notes if less than prev note
-# also translation method for different note forms
-# function later?
+# Converts notes to note_index_map form for compatibility
 
 
 def find_equivalent(chord):
@@ -40,6 +41,8 @@ def find_equivalent(chord):
         else:
             equivalent_chord.append(note)
     return equivalent_chord
+
+# Converts a chord to an array measuring the spacing (e.g. [0, 4, 7] for [C, E, G])
 
 
 def find_spacing(chord):
@@ -53,11 +56,15 @@ def find_spacing(chord):
         chord_indexes.append(note_index)
     return chord_indexes
 
+# Inverts chord by moving first element to end, returns chord and its new spacing
+
 
 def invert(chord):
     chord.append(chord.pop(0))
     chord_spacing = find_spacing(chord)
     return chord, chord_spacing
+
+# Gets the chord quality, root form of the chord, and inversion
 
 
 def get_voicing(chord, spacing):
@@ -66,6 +73,7 @@ def get_voicing(chord, spacing):
     inversions_to_root = ["Root Chord",
                           "Second Inversion",
                           "First Inversion"]
+    # Checks if spacing matches a quality, inverts if this is not the case; repeats 3 times
     for i in range(0, 3):
         if(spacing == MAJOR_SPACING):
             return "Major", chord, inversions_to_root[i]
@@ -74,19 +82,29 @@ def get_voicing(chord, spacing):
         chord, spacing = invert(chord)
     return "Other Voicing", "N/A", "N/A"
 
+# Main function
 
-print("Enter three notes: ")
-input_chord = []
-for i in range(0, 3):
-    input_note = input("Enter a note: ").capitalize()
-    while(note_index_map.get(input_note) == None and note_equivalent_map.get(input_note) == None):  # might be messy
-        print("Invalid note")
+
+def main():
+    # Get 3 notes from user; re-ask for notes if not a valid note
+    print("Enter three notes: ")
+    input_chord = []
+    for i in range(0, 3):
         input_note = input("Enter a note: ").capitalize()
-    input_chord.append(input_note)
+        while(note_index_map.get(input_note) == None and note_equivalent_map.get(input_note) == None):  # might be messy
+            print("Invalid note")
+            input_note = input("Enter a note: ").capitalize()
+        input_chord.append(input_note)
 
-equivalent_chord = find_equivalent(input_chord)
-chord_spacing = find_spacing(equivalent_chord)
-chord_quality, root_chord, inversion = get_voicing(
-    equivalent_chord, chord_spacing)
-print(root_chord[0] + " " + chord_quality + " (" + inversion + ")")
-print(str(root_chord) + " => " + str(input_chord))
+    # Convert to equivalent chord, get chord spacing, then get its quality, root, and inversion
+    equivalent_chord = find_equivalent(input_chord)
+    chord_spacing = find_spacing(equivalent_chord)
+    chord_quality, root_chord, inversion = get_voicing(
+        equivalent_chord, chord_spacing)
+
+    # Print out info
+    print(root_chord[0] + " " + chord_quality + " (" + inversion + ")")
+    print(str(root_chord) + " => " + str(input_chord))
+
+
+main()
